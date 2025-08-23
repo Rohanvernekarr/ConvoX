@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  clerkId          String          @unique
+  username         String          @unique
+  email            String          @unique
+  firstName        String?
+  lastName         String?
+  avatar           String?
+  isOnline         Boolean         @default(false)
+  onboarded        Boolean         @default(false) 
+  lastSeen         DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  directMessages   DirectMessage[]
+  receivedRequests FriendRequest[] @relation("RequestReceiver")
+  sentRequests     FriendRequest[] @relation("RequestSender")
+  friendOf         Friend[]        @relation("FriendOf")
+  friends          Friend[]        @relation("UserFriends")
+  messages         Message[]
+  serverMembers    ServerMember[]
+  servers          Server[]
+
+  @@map("users")
+}
+
+model FriendRequest {
+  id         String              @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  receiver   User                @relation("RequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User                @relation("RequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@map("friend_requests")
+}
+
+model Friend {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  friend    User     @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@map("friends")
+}
+
+model Server {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  inviteCode  String         @unique
+  ownerId     String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  channels    Channel[]
+  members     ServerMember[]
+  owner       User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("servers")
+}
+
+model ServerMember {
+  id       String     @id @default(cuid())
+  role     MemberRole @default(GUEST)
+  userId   String
+  serverId String
+  joinedAt DateTime   @default(now())
+  server   Server     @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, serverId])
+  @@map("server_members")
+}
+
+model Channel {
+  id        String      @id @default(cuid())
+  name      String
+  type      ChannelType @default(TEXT)
+  serverId  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  server    Server      @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@map("channels")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  fileUrl   String?
+  userId    String
+  channelId String
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model DirectMessage {
+  id         String   @id @default(cuid())
+  content    String
+  fileUrl    String?
+  senderId   String
+  receiverId String
+  read       Boolean  @default(false)
+  deleted    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("direct_messages")
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+enum ChannelType {
+  TEXT
+  AUDIO
+  VIDEO
+}
