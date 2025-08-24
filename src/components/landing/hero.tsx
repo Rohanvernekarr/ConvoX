@@ -20,11 +20,11 @@ export function Hero() {
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-zinc-800/50 border border-zinc-800 mb-6">
             <span className="text-sm font-medium text-zinc-300">Now with end-to-end encryption</span>
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6">
-            Stay Connected While You
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500"> Game & Work</span>
+          <h1 className="text-4xl md:text-7xl  font-bold text-white mb-6">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 to-indigo-200">Stay Connected While You</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 to-indigo-200"> Game & Work</span>
           </h1>
-          <p className="text-xl text-zinc-400 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-zinc-300 mb-10 max-w-3xl mx-auto leading-relaxed">
             The <span className="text-white font-medium">lightweight</span> video calling app that runs in the background. 
             Chat with friends, make calls, and create spaces without interrupting your workflow.
           </p>
@@ -32,14 +32,14 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <SignedOut>
               <SignUpButton mode="modal">
-                <Button size="lg" className="px-8 py-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200">
+                <Button size="lg" className="px-8 py-6 bg-gradient-to-r from-zinc-600 to-zinc-900 hover:from-zinc-700 hover:to-zinc-950 text-white font-medium rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200">
                   Start Free Today
                 </Button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
               <Link href="/dashboard">
-                <Button size="lg" className="px-8 py-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200">
+                <Button size="lg" className="px-8 py-6 bg-gradient-to-r from-zinc-600 to-zinc-900 hover:from-zinc-700 hover:to-zinc-950 text-white font-medium rounded-xl border-0 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-200">
                   Go to Dashboard
                 </Button>
               </Link>

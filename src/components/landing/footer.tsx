@@ -30,11 +30,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">CX</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-zinc-500 to-zinc-900 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-xl">C</span>
               </div>
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
-                ConvoX
+              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-indigo-300">
+                ConvoX-Org
               </span>
             </div>
             <p className="text-zinc-400 text-base leading-relaxed max-w-md mb-8">
@@ -66,7 +66,7 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-6 relative">
               Product
-              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
+              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-zinc-500 to-indigo-200 rounded-full"></div>
             </h3>
             <ul className="space-y-4">
               {[
@@ -92,7 +92,7 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-6 relative">
               Support
-              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
+              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-zinc-500 to-indigo-200 rounded-full"></div>
             </h3>
             <ul className="space-y-4">
               {[
@@ -118,7 +118,7 @@ export function Footer() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-6 relative">
               Company
-              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
+              <div className="absolute -bottom-2 left-0 w-8 h-0.5 bg-gradient-to-r from-zinc-500 to-indigo-200 rounded-full"></div>
             </h3>
             <ul className="space-y-4">
               {[
@@ -171,7 +171,7 @@ export function Footer() {
                   className="bg-transparent border-none outline-none text-sm text-white placeholder-zinc-500 w-48"
                 />
               </div>
-              <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-medium px-6 py-2 rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
+              <button className="bg-gradient-to-r from-zinc-600 to-zinc-900 hover:from-zinc-700 hover:to-zinc-950 text-white text-sm font-medium px-6 py-2 rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
                 Subscribe
               </button>
             </div>

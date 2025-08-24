@@ -21,6 +21,8 @@ export async function GET() {
                 avatar: true,
                 isOnline: true,
                 lastSeen: true,
+                firstName: true,
+                lastName: true,
               },
             },
           },

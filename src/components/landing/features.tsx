@@ -63,14 +63,15 @@ import {
           <div className="absolute top-1/2 right-0 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
         </div>
         
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-800/50 border border-zinc-800 mb-6">
               <span className="text-sm font-medium text-zinc-300">Powerful Features</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Everything You Need to Stay 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Connected</span>
+            <h2 className="text-4xl md:text-5xl  font-bold text-white mb-6">
+              Everything You Need to  {" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 to-indigo-300 "> Stay Connected</span>
             </h2>
             <p className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
               Built for gamers and remote workers who need reliable communication without the bloat.

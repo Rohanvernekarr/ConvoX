@@ -11,14 +11,13 @@ const io = new Server(httpServer, {
   },
 });
 
-// Store active users
-const activeUsers = new Map();
-const userSockets = new Map();
+// Store active users and their socket IDs
+const activeUsers = new Map(); // userId -> { socketId, username, isOnline }
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // User joins
+  // User joins with their data
   socket.on('join', (userData) => {
     const { userId, username } = userData;
     socket.userId = userId;
@@ -30,135 +29,85 @@ io.on('connection', (socket) => {
       isOnline: true,
       lastSeen: new Date(),
     });
-    
-    userSockets.set(socket.id, userId);
-    socket.join(`user:${userId}`);
-    
-    // Notify friends about online status
-    socket.broadcast.emit('user-status-change', {
-      userId,
-      isOnline: true,
-    });
 
+    socket.join(`user:${userId}`);
     console.log(`User ${username} (${userId}) joined`);
   });
 
-  // Handle direct messages
-  socket.on('send-direct-message', (data) => {
-    const { receiverId, content, type = 'text' } = data;
+  // ✅ NEW: Handle friend request sending
+  socket.on('send-friend-request', async (data) => {
+    const { senderId, receiverId, senderUsername } = data;
+    
+    console.log(`📤 Friend request: ${senderUsername} → ${receiverId}`);
+    
+    // Check if receiver is online
     const receiverData = activeUsers.get(receiverId);
     
     if (receiverData) {
-      io.to(`user:${receiverId}`).emit('receive-direct-message', {
-        senderId: socket.userId,
-        senderUsername: socket.username,
-        content,
-        type,
+      // Send real-time notification to receiver
+      io.to(`user:${receiverId}`).emit('friend-request-received', {
+        senderId: senderId,
+        senderUsername: senderUsername,
+        message: `${senderUsername} sent you a friend request`,
         timestamp: new Date().toISOString(),
       });
       
-      console.log(`Message sent from ${socket.username} to ${receiverId}`);
+      console.log(`✅ Notified ${receiverId} about friend request from ${senderUsername}`);
+    } else {
+      console.log(`❌ User ${receiverId} is offline`);
     }
   });
 
-  // Handle voice/video call requests
-  socket.on('call-request', (data) => {
-    const { receiverId, callType, offer } = data;
-    const receiverData = activeUsers.get(receiverId);
+  // ✅ NEW: Handle friend request responses
+  socket.on('respond-friend-request', async (data) => {
+    const { requestId, senderId, receiverId, accepted, responderUsername } = data;
     
-    if (receiverData) {
-      io.to(`user:${receiverId}`).emit('incoming-call', {
-        callerId: socket.userId,
-        callerUsername: socket.username,
-        callType,
-        offer,
+    console.log(`📥 Friend request response: ${responderUsername} ${accepted ? 'accepted' : 'declined'}`);
+    
+    // Notify the original sender
+    const senderData = activeUsers.get(senderId);
+    
+    if (senderData) {
+      io.to(`user:${senderId}`).emit('friend-request-responded', {
+        requestId: requestId,
+        accepted: accepted,
+        responderUsername: responderUsername,
+        message: `${responderUsername} ${accepted ? 'accepted' : 'declined'} your friend request`,
+        timestamp: new Date().toISOString(),
       });
       
-      console.log(`${callType} call from ${socket.username} to ${receiverId}`);
+      console.log(`✅ Notified ${senderId} about response from ${responderUsername}`);
     }
   });
 
-  // Handle call responses
-  socket.on('call-response', (data) => {
-    const { callerId, accepted, answer } = data;
-    const callerData = activeUsers.get(callerId);
+  // Handle user status changes
+  socket.on('user-status-change', (data) => {
+    const { userId, isOnline } = data;
     
-    if (callerData) {
-      io.to(`user:${callerId}`).emit('call-answered', {
-        receiverId: socket.userId,
-        accepted,
-        answer,
-      });
+    if (activeUsers.has(userId)) {
+      activeUsers.get(userId).isOnline = isOnline;
       
-      console.log(`Call ${accepted ? 'accepted' : 'declined'} by ${socket.username}`);
-    }
-  });
-
-  // Handle WebRTC signaling
-  socket.on('ice-candidate', (data) => {
-    const { targetUserId, candidate } = data;
-    const targetData = activeUsers.get(targetUserId);
-    
-    if (targetData) {
-      io.to(`user:${targetUserId}`).emit('ice-candidate', {
-        fromUserId: socket.userId,
-        candidate,
-      });
-    }
-  });
-
-  // Handle call end
-  socket.on('end-call', (data) => {
-    const { targetUserId } = data;
-    const targetData = activeUsers.get(targetUserId);
-    
-    if (targetData) {
-      io.to(`user:${targetUserId}`).emit('call-ended', {
-        fromUserId: socket.userId,
-      });
-    }
-  });
-
-  // Handle typing indicators
-  socket.on('typing-start', (data) => {
-    const { receiverId } = data;
-    const receiverData = activeUsers.get(receiverId);
-    
-    if (receiverData) {
-      io.to(`user:${receiverId}`).emit('user-typing', {
-        userId: socket.userId,
-        username: socket.username,
-      });
-    }
-  });
-
-  socket.on('typing-stop', (data) => {
-    const { receiverId } = data;
-    const receiverData = activeUsers.get(receiverId);
-    
-    if (receiverData) {
-      io.to(`user:${receiverId}`).emit('user-stopped-typing', {
-        userId: socket.userId,
+      // Broadcast status to all users
+      socket.broadcast.emit('user-status-update', {
+        userId,
+        isOnline,
       });
     }
   });
 
   // Handle disconnection
   socket.on('disconnect', () => {
-    const userId = userSockets.get(socket.id);
-    
-    if (userId) {
-      activeUsers.delete(userId);
-      userSockets.delete(socket.id);
+    if (socket.userId) {
+      activeUsers.delete(socket.userId);
       
-      // Notify friends about offline status
-      socket.broadcast.emit('user-status-change', {
-        userId,
+      // Notify others about offline status
+      socket.broadcast.emit('user-status-update', {
+        userId: socket.userId,
         isOnline: false,
         lastSeen: new Date().toISOString(),
       });
 
-      console.log(`User ${socket.username} (${userId}) disconnected`);
+      console.log(`User ${socket.username} (${socket.userId}) disconnected`);
     }
   });
 });

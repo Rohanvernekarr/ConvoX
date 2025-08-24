@@ -17,14 +17,14 @@ export function Navbar() {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center ">
             <Link href="/" className="flex items-center space-x-3 group">
-              <div className="w-9 h-9 bg-gradient-to-br from-zinc-500 to-zinc0 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-                <span className="text-white font-serif  text-xl">CX</span>
+              <div className="w-9 h-9 bg-gradient-to-br from-zinc-500 to-zinc-900 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                <span className="text-white font-serif  text-xl">C</span>
               </div>
-              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-zinc-500">ConvoX-Org</span>
+              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-indigo-300">ConvoX-Org</span>
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-2 bg-zinc-800/50 backdrop-blur-sm px-3 py-2 rounded-full border border-zinc-700/50">
+          <div className="hidden md:flex items-center space-x-2  backdrop-blur-sm px-3 py-2 ">
             <Link href="#features" className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-700/50 rounded-full transition-all duration-200">
               Features
             </Link>
@@ -44,7 +44,7 @@ export function Navbar() {
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button className="bg-gradient-to-r from-zinc-600 to-zinc-800 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
+                <Button className="bg-gradient-to-r from-zinc-600 to-zinc-900 hover:from-zinc-700 hover:to-zinc-950 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all">
                   Get Started
                 </Button>
               </SignUpButton>
