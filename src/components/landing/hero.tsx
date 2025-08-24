@@ -7,14 +7,15 @@ import Link from 'next/link';
 
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-24 overflow-hidden">
+    <section className="relative pt-32 pb-24 bg-zinc-950 overflow-hidden">
 
 
-      {/* Grid Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950/95 to-black/95">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(120,119,198,0.05),transparent_70%)]"></div>
-      </div>
-      
+       {/* Decorative elements */}
+       <div className="absolute top-0 left-0 w-full h-full opacity-30">
+          <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute top-1/2 right-0 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        </div>
+        
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
         <div className="text-center">
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-zinc-800/50 border border-zinc-800 mb-6">

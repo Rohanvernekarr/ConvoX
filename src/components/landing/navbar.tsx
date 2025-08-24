@@ -1,12 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { 
-  SignInButton, 
-  SignUpButton, 
-  UserButton, 
-  SignedIn, 
-  SignedOut 
+import {
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  SignedIn,
+  SignedOut
 } from '@clerk/nextjs';
 import Link from 'next/link';
 
@@ -15,16 +15,29 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-900/50 backdrop-blur-xl border-b border-zinc-800/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <div className="flex items-center ">
+          <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="w-9 h-9 bg-gradient-to-br from-zinc-500 to-zinc-900 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-                <span className="text-white font-serif  text-xl">C</span>
+                <span className="text-white font-serif text-xl">C</span>
               </div>
-              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-indigo-300">ConvoX-Org</span>
+
+              {/* Responsive Text - Full name on medium+ screens, short on mobile */}
+              <div className="flex flex-col sm:block">
+                {/* Full name for medium+ screens */}
+                <span className="hidden sm:inline text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-indigo-300">
+                  ConvoX-Org
+                </span>
+
+                {/* Short name for mobile */}
+                <span className="sm:hidden text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 to-indigo-300">
+                  ConvoX
+                </span>
+              </div>
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-2  backdrop-blur-sm px-3 py-2 ">
+
+          <div className="hidden md:flex items-center space-x-2 px-3 py-2 ">
             <Link href="#features" className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-700/50 rounded-full transition-all duration-200">
               Features
             </Link>
@@ -56,7 +69,7 @@ export function Navbar() {
                 </Button>
               </Link>
               <div className="ml-2">
-                <UserButton 
+                <UserButton
                   afterSignOutUrl="/"
                   appearance={{
                     elements: {
