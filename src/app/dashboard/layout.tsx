@@ -9,9 +9,7 @@ export default function DashboardLayout({
   
   return (
     <AuthGuard requireOnboarding={false}>
-      <div className="min-h-screen w-full flex bg-gray-100">
-        {children}
-      </div>
+      {children}
     </AuthGuard>
   );
 }

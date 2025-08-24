@@ -48,17 +48,33 @@ export async function POST(req: Request) {
   const eventType = evt.type;
   console.log('📧 Webhook received:', eventType);
 
-  if (eventType === 'user.created') {
-    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+  if (eventType === 'user.created' || eventType === 'user.updated') {
+    const { id, email_addresses, first_name, last_name, image_url, username } = evt.data;
 
     try {
-      // Check if user already exists
+      // Generate a temporary username if not provided
+      const tempUsername = `user_${Math.random().toString(36).substring(2, 10)}`;
+      
+      // Check if user exists
       const existingUser = await db.user.findUnique({
         where: { clerkId: id },
       });
 
-      if (!existingUser) {
-        // Create user in your Aiven database
+      if (existingUser) {
+        // Update existing user
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: {
+            email: email_addresses[0]?.email_address || existingUser.email,
+            firstName: first_name || existingUser.firstName,
+            lastName: last_name || existingUser.lastName,
+            avatar: image_url || existingUser.avatar,
+            // Don't update username here as it will be set during onboarding
+          },
+        });
+        console.log('✅ Updated user in database:', id);
+      } else {
+        // Create new user with a temporary username
         const newUser = await db.user.create({
           data: {
             clerkId: id,
@@ -66,20 +82,17 @@ export async function POST(req: Request) {
             firstName: first_name || '',
             lastName: last_name || '',
             avatar: image_url || '',
-            username: '', // Will be set during onboarding
+            username: tempUsername,
             isOnline: false
           },
         });
 
-        console.log('✅ User saved to Aiven database:', {
+        console.log('✅ Created new user in database:', {
           clerkId: id,
           email: email_addresses[0]?.email_address,
-          firstName: first_name,
-          lastName: last_name,
+          username: tempUsername,
           databaseId: newUser.id
         });
-      } else {
-        console.log('👤 User already exists in database:', id);
       }
     } catch (error) {
       console.error('❌ Error saving user to Aiven database:', error);

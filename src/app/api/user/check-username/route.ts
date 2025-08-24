@@ -4,8 +4,8 @@ import { db } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await currentUser();
-    if (!user) {
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     }
 
     if (username.length < 3 || username.length > 20) {
-      return NextResponse.json({ available: false, error: 'Username must be 3-20 characters' });
+      return NextResponse.json({ 
+        available: false, 
+        error: 'Username must be 3-20 characters' 
+      });
     }
 
     // Check if username exists
@@ -31,6 +34,9 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error checking username:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ 
+      available: false,
+      error: 'Internal server error' 
+    }, { status: 500 });
   }
 }

@@ -1,22 +1,21 @@
-import { auth } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { receiverId } = await req.json();
 
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const sender = await db.user.findUnique({
+      where: { clerkId: clerkUser.id },
     });
 
-    if (!currentUser) {
+    if (!sender) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -24,7 +23,7 @@ export async function POST(req: NextRequest) {
     const existingRequest = await db.friendRequest.findUnique({
       where: {
         senderId_receiverId: {
-          senderId: currentUser.id,
+          senderId: sender.id,
           receiverId,
         },
       },
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest) {
     // Create friend request
     const friendRequest = await db.friendRequest.create({
       data: {
-        senderId: currentUser.id,
+        senderId: sender.id,
         receiverId,
       },
     });
@@ -51,18 +50,18 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { requestId, action } = await req.json(); // action: 'accept' or 'decline'
+    const { requestId, action } = await req.json();
 
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const currentDbUser = await db.user.findUnique({
+      where: { clerkId: clerkUser.id },
     });
 
-    if (!currentUser) {
+    if (!currentDbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -70,7 +69,7 @@ export async function PUT(req: NextRequest) {
       where: { id: requestId },
     });
 
-    if (!friendRequest || friendRequest.receiverId !== currentUser.id) {
+    if (!friendRequest || friendRequest.receiverId !== currentDbUser.id) {
       return NextResponse.json({ error: 'Friend request not found' }, { status: 404 });
     }
 
