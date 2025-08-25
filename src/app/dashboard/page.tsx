@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrentUser } from '@/hooks/use-current-user';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { FriendsTab } from '@/components/dashboard/friends-tab';
@@ -14,9 +14,15 @@ import { useFriendRequests } from '@/hooks/use-friend-requests';
 interface Friend {
   id: string;
   username: string;
-  avatar?: string;
+  avatar?: string | null;
   isOnline: boolean;
-  lastSeen: Date;
+  lastSeen: Date | string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  clerkId?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 interface IncomingCall {
@@ -30,12 +36,11 @@ export default function DashboardPage() {
   
   // States
   const [activeTab, setActiveTab] = useState('friends');
-  const [activeChat, setActiveChat] = useState<string | null>(null);
-  const [activeChatUser, setActiveChatUser] = useState<Friend | null>(null);
   const [isInCall, setIsInCall] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+  const [activeChatUser, setActiveChatUser] = useState<Friend | null>(null);
 
   // Custom hooks
   const { 
@@ -46,7 +51,9 @@ export default function DashboardPage() {
     messages,
     sendMessage,
     currentMessage,
-    setCurrentMessage
+    setCurrentMessage,
+    activeChat,
+    setActiveChat
   } = useDashboardSocket(dbUser);
 
   const {
@@ -60,6 +67,28 @@ export default function DashboardPage() {
     showAddFriendDialog,
     setShowAddFriendDialog
   } = useFriendRequests(dbUser, socket);
+
+  // Update active chat user when activeChat or friends change
+  useEffect(() => {
+    if (activeChat && friends.length > 0) {
+      const friend = friends.find(f => f.id === activeChat);
+      if (friend) {
+        setActiveChatUser({
+          id: friend.id,
+          username: friend.username,
+          isOnline: friend.isOnline,
+          lastSeen: friend.lastSeen,
+          avatar: friend.avatar || undefined,
+          firstName: friend.firstName || undefined,
+          lastName: friend.lastName || undefined
+        });
+      } else {
+        setActiveChatUser(null);
+      }
+    } else {
+      setActiveChatUser(null);
+    }
+  }, [activeChat, friends]);
 
   // Call functions
   const startVoiceCall = (friendId: string) => {
@@ -138,7 +167,7 @@ export default function DashboardPage() {
         setActiveTab={setActiveTab}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-screen">
         <DashboardHeader
           activeTab={activeTab}
           activeChatUser={activeChatUser}
@@ -147,7 +176,7 @@ export default function DashboardPage() {
           isInCall={isInCall}
         />
 
-        <div className="flex-1 bg-zinc-950 overflow-hidden">
+        <div className="flex-1 bg-zinc-950 overflow-hidden flex flex-col">
           {activeTab === 'friends' && (
             <FriendsTab
               friends={friends}
@@ -160,17 +189,31 @@ export default function DashboardPage() {
               setSearchTerm={setSearchTerm}
               showAddFriendDialog={showAddFriendDialog}
               setShowAddFriendDialog={setShowAddFriendDialog}
-              setActiveTab={setActiveTab}
-              setActiveChat={setActiveChat}
+              setActiveTab={(tab) => {
+                setActiveTab(tab);
+                if (tab === 'messages' && !activeChat && friends.length > 0) {
+                  setActiveChat(friends[0].id);
+                }
+              }}
+              setActiveChat={(friendId) => {
+                setActiveChat(friendId);
+                setActiveTab('messages');
+              }}
               setActiveChatUser={setActiveChatUser}
               startVoiceCall={startVoiceCall}
             />
           )}
 
           {activeTab === 'messages' && (
-            <MessagesTab
+            <MessagesTab 
               activeChatUser={activeChatUser}
-              messages={messages}
+              messages={messages.filter(msg => 
+                (msg.senderId === activeChat && msg.senderId) ||
+                (msg.senderId === dbUser?.id && activeChat)
+              ).map(msg => ({
+                ...msg,
+                receiverId: msg.senderId === dbUser?.id ? activeChat : dbUser?.id
+              }))}
               currentMessage={currentMessage}
               setCurrentMessage={setCurrentMessage}
               sendMessage={sendMessage}

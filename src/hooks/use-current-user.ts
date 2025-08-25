@@ -26,6 +26,7 @@ interface DatabaseUser {
   lastName?: string;
   avatar?: string;
   isOnline: boolean;
+  onboarded: boolean;
   receivedRequests: FriendRequest[];
   friends: FriendRequestUser[];
   lastSeen?: string;
@@ -47,27 +48,34 @@ export function useCurrentUser() {
     const fetchOrCreateUser = async () => {
       try {
         // First try to get the user profile
-        let response = await fetch('/api/user/profile');
-        
-        // If profile doesn't exist, create one
-        if (response.status === 404) {
-          const userData = {
-            email: user.emailAddresses[0]?.emailAddress || '',
-            username: user.username || user.firstName?.toLowerCase() || `user_${Math.random().toString(36).substr(2, 8)}`,
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            avatar: user.imageUrl || '',
-          };
-          
-          response = await fetch('/api/user/create-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData),
-          });
-        }
+        const response = await fetch('/api/user/profile');
         
         if (response.ok) {
           const data = await response.json();
+          if (data.user) {
+            setDbUser(data.user);
+            return;
+          }
+        }
+        
+        // If we get here, either the profile doesn't exist or there was an error
+        // Create a new profile
+        const userData = {
+          email: user.emailAddresses[0]?.emailAddress || '',
+          username: user.username || user.firstName?.toLowerCase() || `user_${Math.random().toString(36).substr(2, 8)}`,
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          avatar: user.imageUrl || '',
+        };
+        
+        const createResponse = await fetch('/api/user/create-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData),
+        });
+        
+        if (createResponse.ok) {
+          const data = await createResponse.json();
           setDbUser(data.user);
         }
       } catch (error) {
@@ -80,8 +88,8 @@ export function useCurrentUser() {
     fetchOrCreateUser();
   }, [user, isLoaded]);
 
-  // Only consider needsOnboarding after we've finished loading the user data
-  const needsOnboarding = isLoaded && user && !loading && !dbUser;
+  // Only consider needsOnboarding if user is loaded, not loading, and dbUser exists but onboarded is false
+  const needsOnboarding = isLoaded && user && !loading && dbUser && !dbUser.onboarded;
 
   return {
     clerkUser: user,

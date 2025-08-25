@@ -46,7 +46,7 @@ export function FriendsTab({
       <div className="mb-6">
         <Dialog open={showAddFriendDialog} onOpenChange={setShowAddFriendDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-zinc-600 hover:bg-zinc-700">
               <UserPlus className="w-4 h-4 mr-2" />
               Add Friend
             </Button>

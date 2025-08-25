@@ -1,12 +1,16 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/prisma';
+import { db, connect, disconnect } from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
+    // Connect to the database
+    await connect();
+    
     const session = await auth();
     const userId = session.userId;
     if (!userId) {
+      await disconnect();
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -18,7 +22,10 @@ export async function POST(req: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json({ user: existingUser });
+      const response = NextResponse.json({ user: existingUser });
+      response.headers.set('Connection', 'close');
+      await disconnect();
+      return response;
     }
 
     // Create new user profile
@@ -31,14 +38,22 @@ export async function POST(req: Request) {
         lastName: lastName || '',
         avatar: avatar || '',
         isOnline: true,
+        onboarded: true, // Mark as onboarded when profile is created
       },
     });
 
-    return NextResponse.json({ user });
+    const response = NextResponse.json({ user });
+    response.headers.set('Connection', 'close');
+    await disconnect();
+    return response;
   } catch (error) {
     console.error('Error creating profile:', error);
+    await disconnect();
     return NextResponse.json(
-      { error: 'Failed to create user profile' },
+      { 
+        error: 'Failed to create user profile',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

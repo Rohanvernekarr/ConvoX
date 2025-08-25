@@ -39,7 +39,7 @@ export function DashboardSidebar({
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
             <AvatarImage src={dbUser.avatar} />
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-zinc-600 text-white">
               {dbUser.username[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -60,7 +60,7 @@ export function DashboardSidebar({
         <div className="space-y-2">
           <Button 
             variant={activeTab === 'friends' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start text-white"
             onClick={() => setActiveTab('friends')}
           >
             <Users className="w-4 h-4 mr-2" />
@@ -72,7 +72,7 @@ export function DashboardSidebar({
           
           <Button 
             variant={activeTab === 'messages' ? 'secondary' : 'ghost'}
-            className="w-full justify-start"
+            className="w-full justify-start text-white"
             onClick={() => setActiveTab('messages')}
           >
             <MessageCircle className="w-4 h-4 mr-2" />

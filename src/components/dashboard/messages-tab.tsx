@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageCircle, Send,Upload } from 'lucide-react';
 
 interface MessagesTabProps {
   activeChatUser: any;
@@ -36,7 +36,7 @@ export function MessagesTab({
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full max-h-[calc(100vh-100px)]">
       {/* Messages Area */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-4">
@@ -61,7 +61,7 @@ export function MessagesTab({
       </div>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-zinc-800">
+      <div className="p-3 border-t border-zinc-800">
         <div className="flex gap-2">
           <Input
             placeholder="Type a message..."
@@ -71,6 +71,9 @@ export function MessagesTab({
             className="flex-1 bg-zinc-800 border-zinc-700"
             disabled={isInCall}
           />
+           <Button onClick={sendMessage} disabled={!currentMessage.trim() || isInCall}>
+            <Upload className="w-4 h-4" />
+          </Button>
           <Button onClick={sendMessage} disabled={!currentMessage.trim() || isInCall}>
             <Send className="w-4 h-4" />
           </Button>

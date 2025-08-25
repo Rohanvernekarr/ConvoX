@@ -18,7 +18,7 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get friend requests received by current user
+    // ✅ Get friend REQUESTS received by current user (not friends)
     const requests = await db.friendRequest.findMany({
       where: {
         receiverId: currentDbUser.id,
@@ -40,9 +40,11 @@ export async function GET() {
       },
     });
 
+    console.log('✅ Friend requests found:', requests.length);
+
     return NextResponse.json({ requests });
   } catch (error) {
-    console.error('Error fetching friend requests:', error);
+    console.error('❌ Error fetching friend requests:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
