@@ -6,6 +6,8 @@ export async function GET(
   request: Request,
   { params }: { params: { userId: string } }
 ) {
+  // Ensure params is properly awaited by destructuring after the function starts
+  const { userId } = params;
   try {
     // Connect to the database
     await connect();
@@ -27,7 +29,7 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const otherUserId = params.userId;
+    const otherUserId = userId;
     console.log('Fetching messages between', user.id, 'and', otherUserId);
 
     // Get messages between the current user and the other user
@@ -81,6 +83,8 @@ export async function POST(
   request: Request,
   { params }: { params: { userId: string } }
 ) {
+  // Ensure params is properly awaited by destructuring after the function starts
+  const { userId: receiverId } = params;
   try {
     // Connect to the database
     await connect();
@@ -103,7 +107,6 @@ export async function POST(
     }
 
     const { content, fileUrl } = await request.json();
-    const receiverId = params.userId;
 
     if (!content && !fileUrl) {
       return NextResponse.json(
